@@ -28,7 +28,8 @@ Class {
 	#superclass : #ClapParameterized,
 	#instVars : [
 		'flags',
-		'subcommands'
+		'subcommands',
+		'namedParameters'
 	],
 	#category : #'Clap-Core-Specification'
 }
@@ -37,13 +38,13 @@ Class {
 ClapCommand class >> forHelp [
 	^ (self withName: 'help')
 		description: 'Prints command documentation';
-
-		add: ((ClapPositional withName: 'topic')
-			description: 'The subcommand to document (defaults to the current one)';
-			meaning: [ :pos :cmd | cmd subcommandNamed: pos word ifNone: nil ];
-			defaultMeaning: [ :pos :cmd | cmd ]);
-
-		meaning: [ :match | | doc parent query topic |
+		add:
+			((ClapPositional withName: 'topic')
+				description: 'The subcommand to document (defaults to the current one)';
+				meaning: [ :pos :cmd | cmd subcommandNamed: pos word ifNone: nil ];
+				implicitMeaning: [ :pos :cmd | cmd ]);
+		meaning: [ :match | 
+			| doc parent query topic |
 			doc := ClapDocumenter on: match context stdout.
 			parent := match parent specification.
 			query := match atName: 'topic'.
@@ -51,12 +52,16 @@ ClapCommand class >> forHelp [
 			topic
 				ifNil: [ match context exitFailure: 'Unknown subcommand: ' , query word ]
 				ifNotNil: [ doc explain: topic ] ]
-
 ]
 
 { #category : #adding }
 ClapCommand >> addFlag: aFlag [
 	flags add: aFlag
+]
+
+{ #category : #adding }
+ClapCommand >> addNamedParameter: aNamedParameter [
+	namedParameters add: aNamedParameter
 ]
 
 { #category : #adding }
@@ -98,12 +103,19 @@ ClapCommand >> initialize [
 	super initialize.
 	subcommands := OrderedCollection new.
 	flags := OrderedCollection new.
+	namedParameters := OrderedCollection new.
+]
+
+{ #category : #accessing }
+ClapCommand >> namedParameters [
+	^ namedParameters 
 ]
 
 { #category : #enumerating }
 ClapCommand >> parametersDo: aBlock [
 	super parametersDo: aBlock.
 	self flags do: aBlock.
+	self namedParameters do: aBlock. 
 	self subcommands do: aBlock
 ]
 

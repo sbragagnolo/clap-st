@@ -116,6 +116,13 @@ ClapCompositeMatch >> matchedSubcommand: foundBlock ifNone: noneBlock [
 ]
 
 { #category : #'accessing - children' }
+ClapCompositeMatch >> namedParameters [
+	^ children
+		select:
+			[ :each | specification namedParameters includes: each specification ]
+]
+
+{ #category : #'accessing - children' }
 ClapCompositeMatch >> occurrencesNamed: canonicalName [
 	^ self occurrencesOf: (specification atName: canonicalName)
 ]

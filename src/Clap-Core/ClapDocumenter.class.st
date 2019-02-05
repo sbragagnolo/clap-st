@@ -73,8 +73,19 @@ ClapDocumenter >> initializeOn: aFormatter [
 ]
 
 { #category : #documenting }
+ClapDocumenter >> namedParameterSynopsis: each [
+	^ formatter
+		text: '[';
+		text: '--';
+		text: each canonicalName;
+		text:'=Value';
+		text: ']'
+]
+
+{ #category : #documenting }
 ClapDocumenter >> parameterDescriptions: aCommand [
 	self section: 'Parameters:' listing: aCommand positionals.
+	self section: 'Named Parameters:' listing: aCommand namedParameters.
 	self section: 'Options:' listing: aCommand flags.
 	self section: 'Commands:' listing: aCommand subcommands
 ]
@@ -108,6 +119,11 @@ ClapDocumenter >> usage: aCommand [
 		formatter space.
 		flags
 			do: [ :each | self flagSynopsis: each ]
+			separatedBy: [ formatter space ] ].
+	aCommand namedParameters  ifNotEmpty: [ :flags | 
+		formatter space.
+		flags
+			do: [ :each | self namedParameterSynopsis: each ]
 			separatedBy: [ formatter space ] ].
 	aCommand positionals ifNotEmpty: [ :positionals | 
 		formatter space.

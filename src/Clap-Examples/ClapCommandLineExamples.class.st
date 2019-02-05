@@ -27,6 +27,7 @@ Class {
 ClapCommandLineExamples class >> git [
 	"A dummy command (no behavior besides help) to demonstrate nested subcommand and as a test subject for the documenter.
 	<commandline> pragma omitted, because doesn't really make sense to make it available outside the image."
+
 	^ (ClapCommand withName: 'git')
 		description: 'The stupid content tracker';
 		add: ClapCommand forHelp;
