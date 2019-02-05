@@ -76,9 +76,13 @@ ClapCommand >> addTo: parentParameter [
 
 { #category : #accessing }
 ClapCommand >> atName: specName [
-	^ self subcommandNamed: specName ifNone:
-		[ self flagNamed: specName ifNone:
-			[ super atName: specName ] ]
+	^ self
+		subcommandNamed: specName
+		ifNone: [ self
+				flagNamed: specName
+				ifNone: [ self
+						namedParameterNamed: specName
+						ifNone: [ super atName: specName ] ] ]
 ]
 
 { #category : #'matching - testing' }
@@ -104,6 +108,13 @@ ClapCommand >> initialize [
 	subcommands := OrderedCollection new.
 	flags := OrderedCollection new.
 	namedParameters := OrderedCollection new.
+]
+
+{ #category : #accessing }
+ClapCommand >> namedParameterNamed: specName ifNone: aBlock [
+	^ namedParameters
+		detect: [ :flag | flag hasAlias: specName ]
+		ifNone: aBlock
 ]
 
 { #category : #accessing }
